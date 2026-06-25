@@ -1,0 +1,178 @@
+apiVersion: v1
+kind: app
+integration: native
+version: 0.5.0
+surfaceSchemaVersion: 1
+metadata:
+  id: "weather"
+  name: "Weather"
+  description: "Weather forecasts, current conditions, and hourly data for your saved locations. Powered by Open-Meteo."
+  icon: "cloud-sun"
+  category: "utilities"
+  website: "https://github.com/YouEye-Platform/Weather"
+  tags: ["weather", "forecast", "native", "utilities"]
+  defaultSubdomain: "weather"
+
+detail:
+  longDescription: |
+    Weather provides forecasts, current conditions, and hourly data for your saved locations.
+    Powered by Open-Meteo — free and requires no API key. Save multiple locations, view
+    7-day forecasts, and get real-time weather data.
+  screenshots:
+    - path: "assets/screenshots/1.png"
+      caption: "Current weather and forecast"
+    - path: "assets/screenshots/2.png"
+      caption: "Saved locations"
+
+capabilities:
+  widgets: true
+  settings_panel: true
+
+surfaces:
+  - id: app-settings
+    kind: settings-panel
+    placement: app-settings
+    name: App Settings
+    description: App-owned settings panel
+    embedPath: /embed/settings
+    permissions: []
+  - id: weather-current
+    kind: widget
+    placement: dashboard
+    name: Current Weather
+    description: Current conditions for your default location
+    embedPath: /embed/widget/weather-current
+    permissions: []
+    defaultSize:
+      width: 22
+      height: 28
+    minSize:
+      width: 15
+      height: 20
+    maxSize:
+      width: 35
+      height: 40
+    refreshInterval: 600
+  - id: weather-forecast
+    kind: widget
+    placement: dashboard
+    name: Weather Forecast
+    description: 5-day forecast for your default location
+    embedPath: /embed/widget/weather-forecast
+    permissions: []
+    defaultSize:
+      width: 35
+      height: 25
+    minSize:
+      width: 25
+      height: 18
+    maxSize:
+      width: 50
+      height: 40
+    refreshInterval: 1800
+  - id: weather-summary
+    kind: info-card
+    placement: timeline
+    name: Weather summary
+    description: Current weather conditions for a location
+    embedPath: /embed/card/weather
+    permissions: []
+  - id: weather-check
+    kind: timeline-card
+    placement: timeline
+    name: Weather checked
+    description: Weather checked for a location
+    embedPath: /embed/timeline/weather
+    permissions:
+      - timeline:write
+    triggers:
+      - weather-check
+  - id: weather-location-added
+    kind: timeline-card
+    placement: timeline
+    name: Weather location added
+    description: Weather location added
+    embedPath: /embed/timeline/weather
+    permissions:
+      - timeline:write
+    triggers:
+      - weather-location-added
+
+wants: []
+internet:
+  proxy:
+    - host: geocoding-api.open-meteo.com
+      paths:
+        - /v1/search*
+      methods:
+        - GET
+    - host: api.open-meteo.com
+      paths:
+        - /v1/forecast*
+      methods:
+        - GET
+
+database:
+  mode: shared
+  name: "ye_weather"
+  user: "ye_weather"
+
+containers:
+  - name: main
+    type: lxd
+    image: debian/12
+    port: 3000
+    primary: true
+    network: isolated
+    source:
+      repo: YouEye-Platform/Weather
+      nodeVersion: "22.x"
+      appDir: /opt/app
+    healthCheck:
+      type: http
+      path: /api/health
+      timeout: 120000
+
+secrets:
+  - name: db_password
+    file: .db_password
+    generator: password
+    length: 32
+  - name: jwt_secret
+    file: .jwt_secret
+    generator: secretKey
+    length: 64
+
+backup:
+  strategy: "stop-dump-export"
+  volumes: []
+
+sso:
+  type: oauth2
+  callback_path: /api/auth/callback
+  setup:
+    method: env
+
+env_mapping:
+  DATABASE_URL: "${database.url}"
+  JWT_SECRET: "${secrets.jwt_secret}"
+  IDENTITY_URL: "${identity.externalUrl}"
+  IDENTITY_INTERNAL_URL: "${identity.internalUrl}"
+  IDENTITY_CLIENT_ID: "${sso.client_id}"
+  IDENTITY_CLIENT_SECRET: "${sso.client_secret}"
+  APP_URL: "${app.url}"
+  WEATHER_EXTERNAL_URL: "${app.url}"
+  YOUEYE_GATEWAY: "${integration.gateway_url}"
+  YOUEYE_APP_TOKEN: "${integration.app_token}"
+  YOUEYE_APP_ID: "${app.id}"
+  NODE_ENV: production
+  PORT: "3000"
+  HOSTNAME: "0.0.0.0"
+
+uninstall:
+  dropSharedDatabase: true
+
+update:
+  strategy: replace
+  preserveData: true
+  preserveSecrets: true

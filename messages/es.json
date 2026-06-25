@@ -1,0 +1,100 @@
+{
+  "weather": {
+    "conditions": {
+      "clear_sky": "Cielo despejado",
+      "mainly_clear": "Principalmente despejado",
+      "partly_cloudy": "Parcialmente nublado",
+      "overcast": "Nublado",
+      "foggy": "Niebla",
+      "depositing_rime_fog": "Niebla helada",
+      "light_drizzle": "Llovizna ligera",
+      "moderate_drizzle": "Llovizna moderada",
+      "dense_drizzle": "Llovizna densa",
+      "freezing_drizzle": "Llovizna congelante",
+      "dense_freezing_drizzle": "Llovizna congelante densa",
+      "slight_rain": "Lluvia leve",
+      "moderate_rain": "Lluvia moderada",
+      "heavy_rain": "Lluvia intensa",
+      "freezing_rain": "Lluvia helada",
+      "heavy_freezing_rain": "Lluvia helada intensa",
+      "slight_snow": "Nieve leve",
+      "moderate_snow": "Nieve moderada",
+      "heavy_snow": "Nieve intensa",
+      "snow_grains": "Granos de nieve",
+      "slight_rain_showers": "Chubascos leves",
+      "moderate_rain_showers": "Chubascos moderados",
+      "violent_rain_showers": "Chubascos violentos",
+      "slight_snow_showers": "Chubascos de nieve leves",
+      "heavy_snow_showers": "Chubascos de nieve intensos",
+      "thunderstorm": "Tormenta",
+      "thunderstorm_slight_hail": "Tormenta con granizo leve",
+      "thunderstorm_heavy_hail": "Tormenta con granizo intenso"
+    },
+    "current": {
+      "title": "Clima actual",
+      "temperature": "Temperatura",
+      "feels_like": "Sensación",
+      "humidity": "Humedad",
+      "wind": "Viento",
+      "wind_gusts": "Ráfagas",
+      "pressure": "Presión",
+      "cloud_cover": "Nubosidad",
+      "precipitation": "Precipitación",
+      "uv_index": "Índice UV",
+      "visibility": "Visibilidad",
+      "sunrise": "Amanecer",
+      "sunset": "Atardecer"
+    },
+    "forecast": {
+      "title": "Pronóstico de 7 días",
+      "hourly_title": "Pronóstico de 48 horas",
+      "hourly": "Por hora",
+      "high": "Máx",
+      "low": "Mín",
+      "precipitation_chance": "Probabilidad de lluvia",
+      "wind_max": "Viento máx",
+      "see_all": "Ver todo"
+    },
+    "locations": {
+      "title": "Gestionar ubicaciones",
+      "add_location": "Agregar ubicación",
+      "search_placeholder": "Buscar ciudades...",
+      "default": "Predeterminado",
+      "set_default": "Establecer como predeterminado",
+      "delete": "Eliminar",
+      "no_locations": "No hay ubicaciones guardadas. Busca arriba para agregar una.",
+      "add_first": "Agrega tu primera ubicación para ver el clima"
+    },
+    "settings": {
+      "title": "Configuración",
+      "temperature_unit": "Unidad de temperatura",
+      "temperature_unit_desc": "Elige tu visualización de temperatura preferida",
+      "celsius": "Celsius (°C)",
+      "fahrenheit": "Fahrenheit (°F)",
+      "wind_speed": "Velocidad del viento",
+      "wind_speed_desc": "Cómo se muestra la velocidad del viento",
+      "precipitation": "Precipitación",
+      "precipitation_desc": "Milímetros o pulgadas",
+      "millimeters": "Milímetros (mm)",
+      "inches": "Pulgadas (in)"
+    },
+    "widgets": {
+      "current_weather": "Clima actual",
+      "weather_forecast": "Pronóstico del tiempo",
+      "no_default_location": "No hay ubicación predeterminada. Abre Clima para agregar una.",
+      "sign_in": "Inicia sesión para ver el clima",
+      "open_weather": "Abrir clima"
+    }
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "loading": "Cargando",
+    "saving": "Guardando",
+    "saved": "Guardado",
+    "back": "Atrás",
+    "error": "Error",
+    "today": "Hoy"
+  }
+}

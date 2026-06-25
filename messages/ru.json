@@ -1,0 +1,100 @@
+{
+  "weather": {
+    "conditions": {
+      "clear_sky": "Ясно",
+      "mainly_clear": "Преимущественно ясно",
+      "partly_cloudy": "Переменная облачность",
+      "overcast": "Пасмурно",
+      "foggy": "Туман",
+      "depositing_rime_fog": "Туман с изморозью",
+      "light_drizzle": "Лёгкая морось",
+      "moderate_drizzle": "Умеренная морось",
+      "dense_drizzle": "Сильная морось",
+      "freezing_drizzle": "Переохлаждённая морось",
+      "dense_freezing_drizzle": "Сильная переохлаждённая морось",
+      "slight_rain": "Небольшой дождь",
+      "moderate_rain": "Умеренный дождь",
+      "heavy_rain": "Сильный дождь",
+      "freezing_rain": "Ледяной дождь",
+      "heavy_freezing_rain": "Сильный ледяной дождь",
+      "slight_snow": "Небольшой снег",
+      "moderate_snow": "Умеренный снег",
+      "heavy_snow": "Сильный снег",
+      "snow_grains": "Снежная крупа",
+      "slight_rain_showers": "Небольшие ливни",
+      "moderate_rain_showers": "Умеренные ливни",
+      "violent_rain_showers": "Сильные ливни",
+      "slight_snow_showers": "Небольшие снежные шквалы",
+      "heavy_snow_showers": "Сильные снежные шквалы",
+      "thunderstorm": "Гроза",
+      "thunderstorm_slight_hail": "Гроза с небольшим градом",
+      "thunderstorm_heavy_hail": "Гроза с сильным градом"
+    },
+    "current": {
+      "title": "Текущая погода",
+      "temperature": "Температура",
+      "feels_like": "Ощущается как",
+      "humidity": "Влажность",
+      "wind": "Ветер",
+      "wind_gusts": "Порывы ветра",
+      "pressure": "Давление",
+      "cloud_cover": "Облачность",
+      "precipitation": "Осадки",
+      "uv_index": "УФ-индекс",
+      "visibility": "Видимость",
+      "sunrise": "Восход",
+      "sunset": "Закат"
+    },
+    "forecast": {
+      "title": "Прогноз на 7 дней",
+      "hourly_title": "Прогноз на 48 часов",
+      "hourly": "Почасовой",
+      "high": "Макс",
+      "low": "Мин",
+      "precipitation_chance": "Вероятность осадков",
+      "wind_max": "Макс. ветер",
+      "see_all": "Смотреть всё"
+    },
+    "locations": {
+      "title": "Управление местами",
+      "add_location": "Добавить место",
+      "search_placeholder": "Поиск городов...",
+      "default": "По умолчанию",
+      "set_default": "Установить по умолчанию",
+      "delete": "Удалить",
+      "no_locations": "Нет сохранённых мест. Найдите выше, чтобы добавить.",
+      "add_first": "Добавьте первое место для просмотра погоды"
+    },
+    "settings": {
+      "title": "Настройки",
+      "temperature_unit": "Единица температуры",
+      "temperature_unit_desc": "Выберите предпочтительный формат температуры",
+      "celsius": "Цельсий (°C)",
+      "fahrenheit": "Фаренгейт (°F)",
+      "wind_speed": "Скорость ветра",
+      "wind_speed_desc": "Как отображается скорость ветра",
+      "precipitation": "Осадки",
+      "precipitation_desc": "Миллиметры или дюймы",
+      "millimeters": "Миллиметры (мм)",
+      "inches": "Дюймы (in)"
+    },
+    "widgets": {
+      "current_weather": "Текущая погода",
+      "weather_forecast": "Прогноз погоды",
+      "no_default_location": "Место по умолчанию не задано. Откройте Погоду, чтобы добавить.",
+      "sign_in": "Войдите, чтобы увидеть погоду",
+      "open_weather": "Открыть погоду"
+    }
+  },
+  "common": {
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "loading": "Загрузка",
+    "saving": "Сохранение",
+    "saved": "Сохранено",
+    "back": "Назад",
+    "error": "Ошибка",
+    "today": "Сегодня"
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "weather": {
+    "conditions": {
+      "clear_sky": "Clear sky",
+      "mainly_clear": "Mainly clear",
+      "partly_cloudy": "Partly cloudy",
+      "overcast": "Overcast",
+      "foggy": "Foggy",
+      "depositing_rime_fog": "Depositing rime fog",
+      "light_drizzle": "Light drizzle",
+      "moderate_drizzle": "Moderate drizzle",
+      "dense_drizzle": "Dense drizzle",
+      "freezing_drizzle": "Freezing drizzle",
+      "dense_freezing_drizzle": "Dense freezing drizzle",
+      "slight_rain": "Slight rain",
+      "moderate_rain": "Moderate rain",
+      "heavy_rain": "Heavy rain",
+      "freezing_rain": "Freezing rain",
+      "heavy_freezing_rain": "Heavy freezing rain",
+      "slight_snow": "Slight snow",
+      "moderate_snow": "Moderate snow",
+      "heavy_snow": "Heavy snow",
+      "snow_grains": "Snow grains",
+      "slight_rain_showers": "Slight rain showers",
+      "moderate_rain_showers": "Moderate rain showers",
+      "violent_rain_showers": "Violent rain showers",
+      "slight_snow_showers": "Slight snow showers",
+      "heavy_snow_showers": "Heavy snow showers",
+      "thunderstorm": "Thunderstorm",
+      "thunderstorm_slight_hail": "Thunderstorm with slight hail",
+      "thunderstorm_heavy_hail": "Thunderstorm with heavy hail"
+    },
+    "current": {
+      "title": "Current Weather",
+      "temperature": "Temperature",
+      "feels_like": "Feels Like",
+      "humidity": "Humidity",
+      "wind": "Wind",
+      "wind_gusts": "Wind Gusts",
+      "pressure": "Pressure",
+      "cloud_cover": "Cloud Cover",
+      "precipitation": "Precipitation",
+      "uv_index": "UV Index",
+      "visibility": "Visibility",
+      "sunrise": "Sunrise",
+      "sunset": "Sunset"
+    },
+    "forecast": {
+      "title": "7-Day Forecast",
+      "hourly_title": "48-Hour Forecast",
+      "hourly": "Hourly",
+      "high": "High",
+      "low": "Low",
+      "precipitation_chance": "Precipitation chance",
+      "wind_max": "Max wind",
+      "see_all": "See all"
+    },
+    "locations": {
+      "title": "Manage Locations",
+      "add_location": "Add Location",
+      "search_placeholder": "Search cities...",
+      "default": "Default",
+      "set_default": "Set as default",
+      "delete": "Delete",
+      "no_locations": "No saved locations. Search above to add one.",
+      "add_first": "Add your first location to see weather"
+    },
+    "settings": {
+      "title": "Settings",
+      "temperature_unit": "Temperature Unit",
+      "temperature_unit_desc": "Choose your preferred temperature display",
+      "celsius": "Celsius (°C)",
+      "fahrenheit": "Fahrenheit (°F)",
+      "wind_speed": "Wind Speed",
+      "wind_speed_desc": "How wind speed is displayed",
+      "precipitation": "Precipitation",
+      "precipitation_desc": "Millimeters or inches",
+      "millimeters": "Millimeters (mm)",
+      "inches": "Inches (in)"
+    },
+    "widgets": {
+      "current_weather": "Current Weather",
+      "weather_forecast": "Weather Forecast",
+      "no_default_location": "No default location set. Open Weather to add one.",
+      "sign_in": "Sign in to see weather",
+      "open_weather": "Open Weather"
+    }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "loading": "Loading",
+    "saving": "Saving",
+    "saved": "Saved",
+    "back": "Back",
+    "error": "Error",
+    "today": "Today"
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "weather": {
+    "conditions": {
+      "clear_sky": "Klarer Himmel",
+      "mainly_clear": "Überwiegend klar",
+      "partly_cloudy": "Teils bewölkt",
+      "overcast": "Bedeckt",
+      "foggy": "Neblig",
+      "depositing_rime_fog": "Raureifnebel",
+      "light_drizzle": "Leichter Nieselregen",
+      "moderate_drizzle": "Mäßiger Nieselregen",
+      "dense_drizzle": "Starker Nieselregen",
+      "freezing_drizzle": "Gefrierender Nieselregen",
+      "dense_freezing_drizzle": "Starker gefrierender Nieselregen",
+      "slight_rain": "Leichter Regen",
+      "moderate_rain": "Mäßiger Regen",
+      "heavy_rain": "Starker Regen",
+      "freezing_rain": "Gefrierender Regen",
+      "heavy_freezing_rain": "Starker gefrierender Regen",
+      "slight_snow": "Leichter Schnee",
+      "moderate_snow": "Mäßiger Schnee",
+      "heavy_snow": "Starker Schnee",
+      "snow_grains": "Schneekörner",
+      "slight_rain_showers": "Leichte Regenschauer",
+      "moderate_rain_showers": "Mäßige Regenschauer",
+      "violent_rain_showers": "Heftige Regenschauer",
+      "slight_snow_showers": "Leichte Schneeschauer",
+      "heavy_snow_showers": "Starke Schneeschauer",
+      "thunderstorm": "Gewitter",
+      "thunderstorm_slight_hail": "Gewitter mit leichtem Hagel",
+      "thunderstorm_heavy_hail": "Gewitter mit starkem Hagel"
+    },
+    "current": {
+      "title": "Aktuelles Wetter",
+      "temperature": "Temperatur",
+      "feels_like": "Gefühlt",
+      "humidity": "Luftfeuchtigkeit",
+      "wind": "Wind",
+      "wind_gusts": "Windböen",
+      "pressure": "Luftdruck",
+      "cloud_cover": "Bewölkung",
+      "precipitation": "Niederschlag",
+      "uv_index": "UV-Index",
+      "visibility": "Sichtweite",
+      "sunrise": "Sonnenaufgang",
+      "sunset": "Sonnenuntergang"
+    },
+    "forecast": {
+      "title": "7-Tage-Vorhersage",
+      "hourly_title": "48-Stunden-Vorhersage",
+      "hourly": "Stündlich",
+      "high": "Hoch",
+      "low": "Tief",
+      "precipitation_chance": "Regenwahrscheinlichkeit",
+      "wind_max": "Max. Wind",
+      "see_all": "Alle anzeigen"
+    },
+    "locations": {
+      "title": "Orte verwalten",
+      "add_location": "Ort hinzufügen",
+      "search_placeholder": "Städte suchen...",
+      "default": "Standard",
+      "set_default": "Als Standard festlegen",
+      "delete": "Löschen",
+      "no_locations": "Keine gespeicherten Orte. Suche oben, um einen hinzuzufügen.",
+      "add_first": "Füge deinen ersten Ort hinzu, um das Wetter zu sehen"
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "temperature_unit": "Temperatureinheit",
+      "temperature_unit_desc": "Wähle deine bevorzugte Temperaturanzeige",
+      "celsius": "Celsius (°C)",
+      "fahrenheit": "Fahrenheit (°F)",
+      "wind_speed": "Windgeschwindigkeit",
+      "wind_speed_desc": "Wie die Windgeschwindigkeit angezeigt wird",
+      "precipitation": "Niederschlag",
+      "precipitation_desc": "Millimeter oder Zoll",
+      "millimeters": "Millimeter (mm)",
+      "inches": "Zoll (in)"
+    },
+    "widgets": {
+      "current_weather": "Aktuelles Wetter",
+      "weather_forecast": "Wettervorhersage",
+      "no_default_location": "Kein Standardort gesetzt. Öffne das Wetter, um einen hinzuzufügen.",
+      "sign_in": "Anmelden, um das Wetter zu sehen",
+      "open_weather": "Wetter öffnen"
+    }
+  },
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "loading": "Laden",
+    "saving": "Speichern",
+    "saved": "Gespeichert",
+    "back": "Zurück",
+    "error": "Fehler",
+    "today": "Heute"
+  }
+}

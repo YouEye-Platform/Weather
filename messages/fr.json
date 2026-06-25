@@ -1,0 +1,100 @@
+{
+  "weather": {
+    "conditions": {
+      "clear_sky": "Ciel dégagé",
+      "mainly_clear": "Principalement dégagé",
+      "partly_cloudy": "Partiellement nuageux",
+      "overcast": "Couvert",
+      "foggy": "Brouillard",
+      "depositing_rime_fog": "Brouillard givrant",
+      "light_drizzle": "Bruine légère",
+      "moderate_drizzle": "Bruine modérée",
+      "dense_drizzle": "Bruine dense",
+      "freezing_drizzle": "Bruine verglaçante",
+      "dense_freezing_drizzle": "Bruine verglaçante dense",
+      "slight_rain": "Pluie légère",
+      "moderate_rain": "Pluie modérée",
+      "heavy_rain": "Forte pluie",
+      "freezing_rain": "Pluie verglaçante",
+      "heavy_freezing_rain": "Forte pluie verglaçante",
+      "slight_snow": "Légère neige",
+      "moderate_snow": "Neige modérée",
+      "heavy_snow": "Forte neige",
+      "snow_grains": "Grains de neige",
+      "slight_rain_showers": "Légères averses",
+      "moderate_rain_showers": "Averses modérées",
+      "violent_rain_showers": "Averses violentes",
+      "slight_snow_showers": "Légères averses de neige",
+      "heavy_snow_showers": "Fortes averses de neige",
+      "thunderstorm": "Orage",
+      "thunderstorm_slight_hail": "Orage avec légère grêle",
+      "thunderstorm_heavy_hail": "Orage avec forte grêle"
+    },
+    "current": {
+      "title": "Météo actuelle",
+      "temperature": "Température",
+      "feels_like": "Ressenti",
+      "humidity": "Humidité",
+      "wind": "Vent",
+      "wind_gusts": "Rafales",
+      "pressure": "Pression",
+      "cloud_cover": "Couverture nuageuse",
+      "precipitation": "Précipitations",
+      "uv_index": "Indice UV",
+      "visibility": "Visibilité",
+      "sunrise": "Lever du soleil",
+      "sunset": "Coucher du soleil"
+    },
+    "forecast": {
+      "title": "Prévisions sur 7 jours",
+      "hourly_title": "Prévisions sur 48 heures",
+      "hourly": "Horaire",
+      "high": "Max",
+      "low": "Min",
+      "precipitation_chance": "Chance de précipitations",
+      "wind_max": "Vent max",
+      "see_all": "Voir tout"
+    },
+    "locations": {
+      "title": "Gérer les lieux",
+      "add_location": "Ajouter un lieu",
+      "search_placeholder": "Rechercher des villes...",
+      "default": "Par défaut",
+      "set_default": "Définir par défaut",
+      "delete": "Supprimer",
+      "no_locations": "Aucun lieu sauvegardé. Recherchez ci-dessus pour en ajouter un.",
+      "add_first": "Ajoutez votre premier lieu pour voir la météo"
+    },
+    "settings": {
+      "title": "Paramètres",
+      "temperature_unit": "Unité de température",
+      "temperature_unit_desc": "Choisissez votre affichage de température préféré",
+      "celsius": "Celsius (°C)",
+      "fahrenheit": "Fahrenheit (°F)",
+      "wind_speed": "Vitesse du vent",
+      "wind_speed_desc": "Comment la vitesse du vent est affichée",
+      "precipitation": "Précipitations",
+      "precipitation_desc": "Millimètres ou pouces",
+      "millimeters": "Millimètres (mm)",
+      "inches": "Pouces (in)"
+    },
+    "widgets": {
+      "current_weather": "Météo actuelle",
+      "weather_forecast": "Prévisions météo",
+      "no_default_location": "Aucun lieu par défaut. Ouvrez Météo pour en ajouter un.",
+      "sign_in": "Connectez-vous pour voir la météo",
+      "open_weather": "Ouvrir la météo"
+    }
+  },
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "loading": "Chargement",
+    "saving": "Enregistrement",
+    "saved": "Enregistré",
+    "back": "Retour",
+    "error": "Erreur",
+    "today": "Aujourd'hui"
+  }
+}
