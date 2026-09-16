@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import { WeatherSettingsPanel } from "@/app/settings/page";
+import { WeatherSettingsPanel } from "@/app/settings/settings-panel";
 
 export default function SettingsEmbedPage() {
   return (
