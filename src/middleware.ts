@@ -5,7 +5,7 @@ initSession("ye-weather");
 
 export const middleware = createCanvasMiddleware({
   appId: "ye-weather",
-  publicRoutes: ["/api/widgets/", "/api/cards/", "/api/inter-app/", "/embed/timeline/", "/embed/widget/"],
+  publicRoutes: ["/embed/timeline/", "/embed/widget/"],
 });
 
 export const config = {

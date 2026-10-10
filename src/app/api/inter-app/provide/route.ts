@@ -1,3 +1,4 @@
+import { getSession } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { fetchWeather } from "@/lib/weather/client";
 import { getWeatherCondition } from "@/lib/weather/codes";
@@ -15,6 +16,8 @@ type LocationRow = Record<string, unknown> & {
 };
 
 export async function POST(request: NextRequest) {
+  const session = await getSession("ye-weather");
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   let body: { request_type?: string; data?: Record<string, unknown> };
   try {
     body = await request.json();
@@ -50,7 +53,7 @@ export async function POST(request: NextRequest) {
 
   if (request_type === "search") {
     const q = typeof data?.query === "string" ? data.query : "";
-    const userId = typeof data?.user_id === "string" ? data.user_id : null;
+    const userId = session.userId;
     if (!userId) {
       return NextResponse.json({ results: [] });
     }

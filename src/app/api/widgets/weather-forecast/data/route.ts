@@ -1,3 +1,4 @@
+import { getSession } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { ensureSchema } from "@/lib/db/migrate";
 import { fetchWeather } from "@/lib/weather/client";
@@ -9,7 +10,9 @@ import type { UserPreferences, SavedLocation } from "@/lib/weather/types";
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export async function GET(request: NextRequest) {
-  const userId = request.headers.get("X-YouEye-User");
+  const session = await getSession("ye-weather");
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const userId = session.userId;
   if (!userId) {
     return NextResponse.json({
       title: "Weather Forecast",
