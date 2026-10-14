@@ -4,7 +4,7 @@ Multi-location weather app for the [YouEye](https://github.com/YouEye-Platform/Y
 
 Weather runs as a native YouEye app. It provides current conditions, forecasts, dashboard widgets, and timeline cards with account and settings integration supplied by YouEye.
 
-Current development source version: `0.4.3.1.0.2`
+The version in `package.json` and `youeye-app.yaml` is the exact source version.
 
 ## Features
 
