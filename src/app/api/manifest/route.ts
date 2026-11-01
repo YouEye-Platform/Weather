@@ -1,11 +1,15 @@
+import { installedRelease } from "@/lib/installed-release";
 import { NextResponse } from "next/server";
 import packageJson from "../../../../package.json";
 
 export async function GET() {
+  const release = await installedRelease("weather", packageJson.version);
   return NextResponse.json({
     id: "ye-weather",
     name: "Weather",
-    version: packageJson.version,
+    version: release?.version ?? "unknown",
+    buildVersion: packageJson.version,
+    release,
     description: "Weather forecasts and conditions for your saved locations",
     icon: "CloudSun",
     permissions: ["timeline:write", "widgets:register"],

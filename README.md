@@ -18,6 +18,11 @@ The version in `package.json` and `youeye-app.yaml` is the exact source version.
 - Theme, language, and account menu integration
 - PWA-ready build with service worker assets
 
+Current conditions load independently of the optional forecast. If a forecast
+request fails, current conditions remain visible alongside a translated retry
+notice. Changing locations cancels the previous request and ignores its late
+responses.
+
 ## YouEye Surfaces
 
 | Surface | Purpose |

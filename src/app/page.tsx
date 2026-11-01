@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useLocale as useInterfaceLocale, useTranslations as useInterfaceTranslations } from "next-intl";
+import { useTranslations as useConditionTranslations } from "next-intl";
+import { loadWeather, type CurrentData, type ForecastData } from "@/lib/weather/load";
 import Link from "next/link";
 import {
-  MapPin, Wind, Droplets, Sunrise, Sunset, ChevronDown,
+  MapPin, Wind, Droplets, Sunrise, Sunset, ChevronDown, RefreshCw, AlertCircle,
 } from "lucide-react";
 import { WeatherIcon } from "@/components/weather/weather-icon";
 import { getWeatherCondition } from "@/lib/weather/codes";
@@ -14,58 +17,49 @@ import type { SavedLocation, UserPreferences, WeatherData } from "@/lib/weather/
 
 /* ── helpers ── */
 
-const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const DAY_NAMES_FULL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 function getUVSeverity(uv: number) {
-  if (uv <= 2) return { label: "Low", bg: "bg-green-500", text: "text-green-600 dark:text-green-400" };
-  if (uv <= 5) return { label: "Moderate", bg: "bg-yellow-500", text: "text-yellow-600 dark:text-yellow-400" };
-  if (uv <= 7) return { label: "High", bg: "bg-orange-500", text: "text-orange-600 dark:text-orange-400" };
-  if (uv <= 10) return { label: "Very High", bg: "bg-red-500", text: "text-red-600 dark:text-red-400" };
-  return { label: "Extreme", bg: "bg-purple-600", text: "text-purple-600 dark:text-purple-400" };
+  if (uv <= 2) return { label: "uvLow", bg: "bg-green-500", text: "text-green-600 dark:text-green-400" };
+  if (uv <= 5) return { label: "uvModerate", bg: "bg-yellow-500", text: "text-yellow-600 dark:text-yellow-400" };
+  if (uv <= 7) return { label: "uvHigh", bg: "bg-orange-500", text: "text-orange-600 dark:text-orange-400" };
+  if (uv <= 10) return { label: "uvVeryHigh", bg: "bg-red-500", text: "text-red-600 dark:text-red-400" };
+  return { label: "uvExtreme", bg: "bg-purple-600", text: "text-purple-600 dark:text-purple-400" };
 }
 
 function getHumidityComfort(h: number) {
-  if (h < 30) return "Dry";
-  if (h < 60) return "Comfortable";
-  if (h < 70) return "Humid";
-  return "Very Humid";
+  if (h < 30) return "humidityDry";
+  if (h < 60) return "humidityComfortable";
+  if (h < 70) return "humidityHumid";
+  return "humidityVeryHumid";
 }
 
-function fmtTime(iso: string) {
-  return new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+function fmtTime(iso: string, locale: string) {
+  return new Date(iso).toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit" });
 }
 
 /* ── types ── */
 
 type TabType = "today" | "hourly" | "7day";
 
-interface CurrentData {
-  location_name: string;
-  current: WeatherData["current"];
-  temperature: string;
-  feels_like: string;
-  condition: string;
-  icon: string;
-  wind: string;
-  prefs: UserPreferences;
-}
-
-interface ForecastData {
-  daily: WeatherData["daily"];
-  hourly: WeatherData["hourly"];
-  timezone: string;
-}
 
 /* ── page ── */
 
 export default function WeatherHome() {
+  const translateInterface = useInterfaceTranslations("interface");
+
+  const conditionText = useConditionTranslations("weather.conditions");
+
+  const interfaceLocale = useInterfaceLocale();
+
+
   const [locations, setLocations] = useState<SavedLocation[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<SavedLocation | null>(null);
   const [currentData, setCurrentData] = useState<CurrentData | null>(null);
   const [forecastData, setForecastData] = useState<ForecastData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [forecastError, setForecastError] = useState(false);
+  const weatherRequest = useRef<AbortController | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("today");
   const [expandedDay, setExpandedDay] = useState<number | null>(null);
 
@@ -77,46 +71,31 @@ export default function WeatherHome() {
   }, []);
 
   const fetchCurrent = useCallback(async (location?: SavedLocation) => {
+    weatherRequest.current?.abort();
+    const controller = new AbortController();
+    weatherRequest.current = controller;
     setLoading(true);
     setError(null);
-    try {
-      let url = "/api/weather/current";
-      if (location) {
-        url += `?lat=${location.latitude}&lon=${location.longitude}&tz=${encodeURIComponent(location.timezone)}&location_id=${location.id}&location_name=${encodeURIComponent(location.name)}`;
-      }
-      const res = await fetch(url);
-      const data = await res.json();
-      setCurrentData(data.data ?? null);
-    } catch {
-      setError("Failed to fetch weather");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    setForecastError(false);
+    setCurrentData(null);
+    setForecastData(null);
+    const params = location ? new URLSearchParams({
+      lat: String(location.latitude), lon: String(location.longitude), tz: location.timezone,
+      location_id: location.id, location_name: location.name,
+    }) : new URLSearchParams();
+    await loadWeather(params, controller.signal, {
+      onCurrent: setCurrentData,
+      onCurrentError: () => setError(translateInterface("currentLoadError")),
+      onCurrentSettled: () => setLoading(false),
+      onForecast: setForecastData,
+      onForecastError: () => setForecastError(true),
+    });
+  }, [translateInterface]);
 
   useEffect(() => {
     fetchCurrent(selectedLocation ?? undefined);
+    return () => weatherRequest.current?.abort();
   }, [selectedLocation, fetchCurrent]);
-
-  useEffect(() => {
-    const loc = selectedLocation;
-    let url = "/api/weather/forecast";
-    if (loc) {
-      url += `?lat=${loc.latitude}&lon=${loc.longitude}&tz=${encodeURIComponent(loc.timezone)}`;
-    }
-    fetch(url)
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.data) {
-          setForecastData({
-            daily: d.data.daily,
-            hourly: d.data.hourly,
-            timezone: d.data.timezone ?? "UTC",
-          });
-        }
-      })
-      .catch(() => {});
-  }, [selectedLocation]);
 
   const prefs = currentData?.prefs ?? {
     temperature_unit: "celsius" as const,
@@ -135,15 +114,20 @@ export default function WeatherHome() {
     : "";
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-100/60 via-sky-50/30 to-background dark:from-blue-950/40 dark:via-background dark:to-background">
-      <div className="mx-auto max-w-5xl px-4 py-6 md:px-8 space-y-6">
+    <div className="weather-workspace">
+      <div className="mx-auto max-w-6xl px-4 py-8 md:px-8 space-y-6">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div><p className="mb-1 text-sm text-muted-foreground">{translateInterface("dayIntroduction")}</p><h1 className="text-3xl font-semibold tracking-tight">{translateInterface("weatherTitle")}</h1></div>
+          <Link href="/locations" className="inline-flex min-h-11 items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><MapPin className="h-4 w-4" />{translateInterface("manageLocations")}</Link>
+        </div>
         {/* ── location switcher ── */}
         <div className="flex items-center gap-2 flex-wrap">
           {locations.map((loc) => (
             <button
               key={loc.id}
-              onClick={() => setSelectedLocation(loc)}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors border ${
+              aria-pressed={(selectedLocation?.id ?? prefs.default_location_id) === loc.id}
+              onClick={() => { setSelectedLocation(loc); setExpandedDay(null); }}
+              className={`min-h-11 rounded-xl px-4 py-2 text-sm font-medium transition-colors border ${
                 (selectedLocation?.id ?? prefs.default_location_id) === loc.id
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-card/70 text-foreground border-border/30 hover:bg-card"
@@ -154,9 +138,9 @@ export default function WeatherHome() {
           ))}
           <Link
             href="/locations"
-            className="rounded-full px-4 py-1.5 text-sm font-medium border border-dashed border-border/50 text-muted-foreground hover:text-foreground hover:border-border transition-colors"
+            className="min-h-11 rounded-xl px-4 py-2 text-sm font-medium border border-dashed border-border/50 text-muted-foreground hover:text-foreground hover:border-border transition-colors"
           >
-            + Add
+            {translateInterface("addLocation")}
           </Link>
         </div>
 
@@ -166,11 +150,14 @@ export default function WeatherHome() {
             <div className="text-5xl mb-4 animate-pulse">
               <WeatherIcon name="CloudSun" size={48} className="mx-auto" />
             </div>
-            <p>Loading weather...</p>
+            <p>{translateInterface("m8606e2e31bf4")}</p>
           </div>
         ) : error ? (
-          <div className="rounded-2xl border border-destructive/40 bg-destructive/10 p-8 text-center text-destructive">
-            {error}
+          <div role="alert" className="rounded-2xl border border-border bg-card p-6">
+            <AlertCircle className="mb-3 h-5 w-5 text-destructive" />
+            <h2 className="mb-2 text-lg font-semibold">{translateInterface("weatherUnavailable")}</h2>
+            <p className="text-sm text-muted-foreground">{error}</p>
+            <button onClick={() => fetchCurrent(selectedLocation ?? undefined)} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl border border-border px-4 text-sm"><RefreshCw className="h-4 w-4" />{translateInterface("tryAgain")}</button>
           </div>
         ) : !currentData ? (
           <div className="rounded-2xl bg-card/60 backdrop-blur-sm p-12 text-center">
@@ -178,38 +165,38 @@ export default function WeatherHome() {
               <MapPin size={48} className="mx-auto text-muted-foreground" />
             </div>
             <p className="text-muted-foreground mb-6">
-              Add your first location to see weather
+              {locations.length ? translateInterface("chooseSavedLocation") : translateInterface("addFirstLocation")}
             </p>
             <Link
               href="/locations"
               className="inline-block rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
             >
-              Add Location
+              {locations.length ? translateInterface("manageLocations") : translateInterface("addLocation")}
             </Link>
           </div>
         ) : (
-          <section className="pt-2 pb-2">
+          <section className="weather-current">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
                   <MapPin size={18} className="text-primary shrink-0" />
-                  <h1 className="text-2xl font-bold text-foreground truncate">
+                  <h2 className="text-2xl font-semibold text-foreground break-words">
                     {currentData.location_name}
-                  </h1>
+                  </h2>
                 </div>
                 {locationSubtitle && (
                   <p className="text-sm text-muted-foreground ml-[26px] mb-4">
                     {locationSubtitle}
                   </p>
                 )}
-                <div className="text-[5rem] md:text-[6.5rem] font-extralight tracking-tighter text-foreground leading-none">
+                <div className="text-[4.5rem] md:text-[6.5rem] font-light tracking-tighter text-foreground leading-none">
                   {currentData.temperature}
                 </div>
                 <p className="text-lg text-muted-foreground mt-1">
-                  {currentData.condition}
+                  {getWeatherCondition(currentData.current.weather_code, currentData.current.is_day, conditionText).description}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Feels like {currentData.feels_like}
+                  {translateInterface("mc72137c4af3a")}{" "}{currentData.feels_like}
                 </p>
               </div>
               <div className="hidden md:flex items-start pt-8">
@@ -225,30 +212,22 @@ export default function WeatherHome() {
             <div className="flex items-center gap-3 mt-5 text-sm text-muted-foreground flex-wrap">
               {forecastData && (
                 <span>
-                  H:{" "}
-                  {formatTemperature(
-                    forecastData.daily.temperature_2m_max[0] ?? 0,
-                    prefs.temperature_unit,
-                  )}{" "}
-                  L:{" "}
-                  {formatTemperature(
-                    forecastData.daily.temperature_2m_min[0] ?? 0,
-                    prefs.temperature_unit,
-                  )}
+                  {translateInterface("weatherHigh", {temperature: formatTemperature(forecastData.daily.temperature_2m_max[0] ?? 0, prefs.temperature_unit)})}{" "}
+                  {translateInterface("weatherLow", {temperature: formatTemperature(forecastData.daily.temperature_2m_min[0] ?? 0, prefs.temperature_unit)})}
                 </span>
               )}
               <span className="opacity-25">|</span>
               <span className="flex items-center gap-1">
                 <Wind size={14} />
-                {currentData.wind}{" "}
-                {windDirectionToCompass(currentData.current.wind_direction)}
+                {formatWindSpeed(currentData.current.wind_speed, prefs.wind_speed_unit, interfaceLocale)}{" "}
+                {windDirectionToCompass(currentData.current.wind_direction, interfaceLocale)}
               </span>
               {forecastData && (
                 <>
                   <span className="opacity-25">|</span>
                   <span className="flex items-center gap-1">
                     <Droplets size={14} className="text-blue-400" />
-                    Rain{" "}
+                    {translateInterface("ma6d20aa6a4c7")}{" "}
                     {forecastData.daily.precipitation_probability_max[0] ?? 0}%
                   </span>
                 </>
@@ -263,22 +242,27 @@ export default function WeatherHome() {
             {(["today", "hourly", "7day"] as const).map((tab) => (
               <button
                 key={tab}
+                aria-pressed={activeTab === tab}
                 onClick={() => {
                   setActiveTab(tab);
                   setExpandedDay(null);
                 }}
-                className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
+                className={`min-h-11 px-5 py-2 rounded-xl text-sm font-medium transition-colors ${
                   activeTab === tab
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
               >
-                {tab === "today" ? "Today" : tab === "hourly" ? "Hourly" : "7-Day"}
+                {tab === "today" ? translateInterface("m2b065c7c9ce4") : tab === "hourly" ? translateInterface("meab0cd8fdf9b") : translateInterface("mbd4189eb36a9")}
               </button>
             ))}
           </div>
         )}
 
+        {forecastError && !loading && currentData && <div role="alert" className="rounded-xl border border-border bg-card p-4 text-sm">
+          <p>{translateInterface("forecastUnavailable")}</p>
+          <button onClick={() => fetchCurrent(selectedLocation ?? undefined)} className="mt-2 inline-flex min-h-11 items-center gap-2 font-medium"><RefreshCw className="h-4 w-4" />{translateInterface("retryForecast")}</button>
+        </div>}
         {/* ── tab content ── */}
         {currentData && forecastData && !loading && (
           <>
@@ -301,25 +285,24 @@ export default function WeatherHome() {
                 </div>
 
                 {/* 7-day mini */}
-                <div className="rounded-2xl bg-card/90 border border-border/20 overflow-hidden">
+                <div className="rounded-2xl bg-card border border-border overflow-hidden">
                   <div className="px-5 py-3 border-b border-border/10 flex items-center justify-between">
-                    <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      7-Day Forecast
+                    <h3 className="text-sm font-medium text-muted-foreground">
+                      {translateInterface("m3181eed107eb")}
                     </h3>
                     <button
                       onClick={() => setActiveTab("7day")}
                       className="text-xs text-primary hover:underline"
                     >
-                      See all
-                    </button>
+                      {translateInterface("md7a8c446069a")}</button>
                   </div>
                   {forecastData.daily.time.map((dateStr, i) => {
                     const date = new Date(dateStr + "T12:00:00");
                     const dayName =
-                      i === 0 ? "Today" : (DAY_NAMES[date.getDay()] ?? "");
+                      i === 0 ? translateInterface("today") : new Intl.DateTimeFormat(interfaceLocale, { weekday: "short" }).format(date);
                     const cond = getWeatherCondition(
                       forecastData.daily.weather_code[i] ?? 0,
-                      true,
+                      true, conditionText
                     );
                     return (
                       <div
@@ -367,11 +350,11 @@ export default function WeatherHome() {
                   const date = new Date(dateStr + "T12:00:00");
                   const dayName =
                     i === 0
-                      ? "Today"
-                      : (DAY_NAMES_FULL[date.getDay()] ?? dateStr);
+                      ? translateInterface("today")
+                      : new Intl.DateTimeFormat(interfaceLocale, { weekday: "long" }).format(date);
                   const cond = getWeatherCondition(
                     forecastData.daily.weather_code[i] ?? 0,
-                    true,
+                    true, conditionText
                   );
                   const isExpanded = expandedDay === i;
                   const hourStart = i * 24;
@@ -379,12 +362,11 @@ export default function WeatherHome() {
                   return (
                     <div
                       key={dateStr}
-                      className="rounded-xl bg-card/90 border border-border/20 overflow-hidden"
+                      className="rounded-xl bg-card border border-border overflow-hidden"
                     >
                       <button
-                        onClick={() =>
-                          setExpandedDay(isExpanded ? null : i)
-                        }
+                        aria-expanded={isExpanded}
+                        onClick={() => setExpandedDay(isExpanded ? null : i)}
                         className="w-full p-4 flex items-center gap-4 hover:bg-muted/30 transition-colors text-left"
                       >
                         <span className="w-28 text-sm font-medium">
@@ -429,12 +411,11 @@ export default function WeatherHome() {
                           <Wind size={12} />
                           {formatWindSpeed(
                             forecastData.daily.wind_speed_10m_max[i] ?? 0,
-                            prefs.wind_speed_unit,
+                            prefs.wind_speed_unit, interfaceLocale,
                           )}{" "}
-                          max
-                        </span>
+                          {translateInterface("m9baf3a40312f")}</span>
                         <span>
-                          UV{" "}
+                          {translateInterface("m027fcbbc3e6f")}{" "}
                           {forecastData.daily.uv_index_max[i] ?? 0}
                         </span>
                       </div>
@@ -442,8 +423,8 @@ export default function WeatherHome() {
                       {/* expanded hourly */}
                       {isExpanded && (
                         <div className="border-t border-border/10 px-4 pb-4 pt-3">
-                          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-3">
-                            Hourly
+                          <p className="text-sm font-medium text-muted-foreground mb-3">
+                            {translateInterface("meab0cd8fdf9b")}
                           </p>
                           <div className="space-y-1 max-h-64 overflow-y-auto">
                             {forecastData.hourly.time
@@ -452,7 +433,7 @@ export default function WeatherHome() {
                                 const gi = hourStart + hi;
                                 const hCond = getWeatherCondition(
                                   forecastData.hourly.weather_code[gi] ?? 0,
-                                  (forecastData.hourly.is_day[gi] ?? 1) === 1,
+                                  (forecastData.hourly.is_day[gi] ?? 1) === 1, conditionText
                                 );
                                 return (
                                   <div
@@ -460,7 +441,7 @@ export default function WeatherHome() {
                                     className="flex items-center gap-3 text-sm py-1"
                                   >
                                     <span className="w-16 text-muted-foreground text-xs">
-                                      {new Date(time).toLocaleTimeString([], {
+                                      {new Date(time).toLocaleTimeString(interfaceLocale, {
                                         hour: "2-digit",
                                         minute: "2-digit",
                                       })}
@@ -510,6 +491,12 @@ function HourlyScroll({
   hourly: WeatherData["hourly"];
   prefs: UserPreferences;
 }) {
+  const conditionText = useConditionTranslations("weather.conditions");
+
+  const interfaceLocale = useInterfaceLocale();
+
+  const translateInterface = useInterfaceTranslations("interface");
+
   const nowMs = Date.now();
   const startIdx = Math.max(
     0,
@@ -518,9 +505,9 @@ function HourlyScroll({
   const hours = hourly.time.slice(startIdx, startIdx + 24);
 
   return (
-    <div className="rounded-2xl bg-card/90 border border-border/20 p-5">
-      <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-4">
-        Hourly Forecast
+    <div className="rounded-2xl bg-card border border-border p-5">
+      <h3 className="text-sm font-medium text-muted-foreground mb-4">
+        {translateInterface("m2832fde21ae2")}
       </h3>
       <div className="overflow-x-auto">
         <div className="flex gap-3 pb-1" style={{ minWidth: "max-content" }}>
@@ -529,7 +516,7 @@ function HourlyScroll({
             const isDay = (hourly.is_day[gi] ?? 1) === 1;
             const cond = getWeatherCondition(
               hourly.weather_code[gi] ?? 0,
-              isDay,
+              isDay, conditionText
             );
             const temp = formatTemperature(
               hourly.temperature_2m[gi] ?? 0,
@@ -537,8 +524,8 @@ function HourlyScroll({
             );
             const isNow = i === 0;
             const label = isNow
-              ? "Now"
-              : new Date(timeStr).toLocaleTimeString([], { hour: "numeric" });
+              ? translateInterface("mfe18013d93d2")
+              : new Date(timeStr).toLocaleTimeString(interfaceLocale, { hour: "numeric" });
 
             return (
               <div
@@ -566,11 +553,13 @@ function HourlyScroll({
 }
 
 function UVCard({ uv }: { uv: number }) {
+  const translateInterface = useInterfaceTranslations("interface");
+
   const severity = getUVSeverity(uv);
   return (
-    <div className="rounded-2xl bg-card/90 border border-border/20 p-5">
-      <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-3">
-        UV Index
+    <div className="rounded-2xl bg-card border border-border p-5">
+      <h3 className="text-sm font-medium text-muted-foreground mb-3">
+        {translateInterface("ma25c25db5066")}
       </h3>
       <div className="flex items-center gap-4">
         <div
@@ -579,7 +568,7 @@ function UVCard({ uv }: { uv: number }) {
           {Math.round(uv)}
         </div>
         <span className={`text-sm font-medium ${severity.text}`}>
-          {severity.label}
+          {translateInterface(severity.label)}
         </span>
       </div>
     </div>
@@ -587,17 +576,19 @@ function UVCard({ uv }: { uv: number }) {
 }
 
 function HumidityCard({ humidity }: { humidity: number }) {
+  const translateInterface = useInterfaceTranslations("interface");
+
   const comfort = getHumidityComfort(humidity);
   return (
-    <div className="rounded-2xl bg-card/90 border border-border/20 p-5">
-      <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-3">
-        Humidity
+    <div className="rounded-2xl bg-card border border-border p-5">
+      <h3 className="text-sm font-medium text-muted-foreground mb-3">
+        {translateInterface("m46819ccb5e6d")}
       </h3>
       <div className="flex items-center gap-4">
         <Droplets size={32} className="text-blue-400 shrink-0" />
         <div>
           <p className="text-3xl font-semibold text-foreground">{humidity}%</p>
-          <p className="text-sm text-muted-foreground">{comfort}</p>
+          <p className="text-sm text-muted-foreground">{translateInterface(comfort)}</p>
         </div>
       </div>
     </div>
@@ -611,6 +602,9 @@ function SunriseSunsetCard({
   sunrise: string;
   sunset: string;
 }) {
+  const interfaceLocale = useInterfaceLocale();
+  const translateInterface = useInterfaceTranslations("interface");
+
   if (!sunrise || !sunset) return null;
 
   const sunriseMs = new Date(sunrise).getTime();
@@ -628,9 +622,9 @@ function SunriseSunsetCard({
   const sunY = 80 - 65 * Math.sin(angle);
 
   return (
-    <div className="rounded-2xl bg-card/90 border border-border/20 p-5">
-      <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-3">
-        Sunrise & Sunset
+    <div className="rounded-2xl bg-card border border-border p-5">
+      <h3 className="text-sm font-medium text-muted-foreground mb-3">
+        {translateInterface("mbdc8665f208c")}
       </h3>
       <svg viewBox="0 0 200 100" className="w-full h-auto mb-2">
         {/* horizon line */}
@@ -679,11 +673,11 @@ function SunriseSunsetCard({
       <div className="flex justify-between text-sm">
         <span className="flex items-center gap-1.5 text-muted-foreground">
           <Sunrise size={14} className="text-amber-500" />
-          {fmtTime(sunrise)}
+          {fmtTime(sunrise, interfaceLocale)}
         </span>
         <span className="flex items-center gap-1.5 text-muted-foreground">
           <Sunset size={14} className="text-orange-500" />
-          {fmtTime(sunset)}
+          {fmtTime(sunset, interfaceLocale)}
         </span>
       </div>
     </div>
@@ -697,6 +691,10 @@ function HourlyExpanded({
   hourly: WeatherData["hourly"];
   prefs: UserPreferences;
 }) {
+  const conditionText = useConditionTranslations("weather.conditions");
+
+  const interfaceLocale = useInterfaceLocale();
+
   const hours = hourly.time.slice(0, 48);
   const temps = hourly.temperature_2m.slice(0, 48);
   const minTemp = Math.min(...temps);
@@ -704,16 +702,16 @@ function HourlyExpanded({
   const tempRange = maxTemp - minTemp || 1;
 
   return (
-    <div className="rounded-2xl bg-card/90 border border-border/20 overflow-hidden">
+    <div className="rounded-2xl bg-card border border-border overflow-hidden">
       {hours.map((timeStr, i) => {
         const time = new Date(timeStr);
-        const timeLabel = time.toLocaleTimeString([], {
+        const timeLabel = time.toLocaleTimeString(interfaceLocale, {
           hour: "2-digit",
           minute: "2-digit",
         });
         const dateLabel =
           i === 0 || time.getHours() === 0
-            ? time.toLocaleDateString([], {
+            ? time.toLocaleDateString(interfaceLocale, {
                 weekday: "short",
                 month: "short",
                 day: "numeric",
@@ -721,7 +719,7 @@ function HourlyExpanded({
             : null;
         const temp = hourly.temperature_2m[i] ?? 0;
         const isDay = (hourly.is_day[i] ?? 1) === 1;
-        const cond = getWeatherCondition(hourly.weather_code[i] ?? 0, isDay);
+        const cond = getWeatherCondition(hourly.weather_code[i] ?? 0, isDay, conditionText);
         const barW = Math.max(5, Math.round(((temp - minTemp) / tempRange) * 100));
         const precip = hourly.precipitation_probability[i] ?? 0;
 

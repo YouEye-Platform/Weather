@@ -1,5 +1,7 @@
 "use client";
 
+
+import { useTranslations as useInterfaceTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { UserPreferences } from "@/lib/weather/types";
@@ -9,6 +11,8 @@ type WindUnit = "kmh" | "mph" | "ms" | "knots";
 type PrecipUnit = "mm" | "inch";
 
 export function WeatherSettingsPanel({ embedded = false }: { embedded?: boolean }) {
+  const translateInterface = useInterfaceTranslations("interface");
+
   const [prefs, setPrefs] = useState<UserPreferences>({
     temperature_unit: "celsius",
     wind_speed_unit: "kmh",
@@ -49,7 +53,7 @@ export function WeatherSettingsPanel({ embedded = false }: { embedded?: boolean 
   if (loading) {
     return (
       <div className="min-h-screen p-8 flex items-center justify-center">
-        <div className="text-muted-foreground animate-pulse">Loading settings...</div>
+        <div className="text-muted-foreground animate-pulse">{translateInterface("m157fd50d1133")}</div>
       </div>
     );
   }
@@ -59,8 +63,8 @@ export function WeatherSettingsPanel({ embedded = false }: { embedded?: boolean 
       <div className="mx-auto max-w-xl space-y-6">
         {!embedded && (
           <div className="flex items-center gap-4">
-            <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">← Back</Link>
-            <h1 className="text-2xl font-bold">Settings</h1>
+            <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">{translateInterface("maceb696a04c1")}</Link>
+            <h1 className="text-2xl font-bold">{translateInterface("m74a883a037bc")}</h1>
           </div>
         )}
 
@@ -68,8 +72,8 @@ export function WeatherSettingsPanel({ embedded = false }: { embedded?: boolean 
 
           {/* Temperature unit */}
           <div>
-            <label className="text-sm font-semibold text-foreground block mb-2">Temperature Unit</label>
-            <p className="text-xs text-muted-foreground mb-3">Choose your preferred temperature display</p>
+            <label className="text-sm font-semibold text-foreground block mb-2">{translateInterface("m47043d68c8b6")}</label>
+            <p className="text-xs text-muted-foreground mb-3">{translateInterface("m99155ffdb89a")}</p>
             <div className="flex gap-2">
               {(["celsius", "fahrenheit"] as TempUnit[]).map((u) => (
                 <button
@@ -81,7 +85,7 @@ export function WeatherSettingsPanel({ embedded = false }: { embedded?: boolean 
                       : "border-border/40 text-foreground hover:bg-card"
                   }`}
                 >
-                  {u === "celsius" ? "Celsius (°C)" : "Fahrenheit (°F)"}
+                  {u === "celsius" ? translateInterface("m400b949d3863") : translateInterface("m9c9497df3469")}
                 </button>
               ))}
             </div>
@@ -89,8 +93,8 @@ export function WeatherSettingsPanel({ embedded = false }: { embedded?: boolean 
 
           {/* Wind speed unit */}
           <div>
-            <label className="text-sm font-semibold text-foreground block mb-2">Wind Speed</label>
-            <p className="text-xs text-muted-foreground mb-3">How wind speed is displayed</p>
+            <label className="text-sm font-semibold text-foreground block mb-2">{translateInterface("m5d021bf0f777")}</label>
+            <p className="text-xs text-muted-foreground mb-3">{translateInterface("m6ba048c03214")}</p>
             <div className="flex gap-2 flex-wrap">
               {(["kmh", "mph", "ms", "knots"] as WindUnit[]).map((u) => (
                 <button
@@ -102,7 +106,7 @@ export function WeatherSettingsPanel({ embedded = false }: { embedded?: boolean 
                       : "border-border/40 text-foreground hover:bg-card"
                   }`}
                 >
-                  {u === "kmh" ? "km/h" : u === "mph" ? "mph" : u === "ms" ? "m/s" : "knots"}
+                  {u === "kmh" ? translateInterface("m3c9db5a7f5e1") : u === "mph" ? translateInterface("mefcc859903e7") : u === "ms" ? "m/s" : translateInterface("me1404219ff5e")}
                 </button>
               ))}
             </div>
@@ -110,8 +114,8 @@ export function WeatherSettingsPanel({ embedded = false }: { embedded?: boolean 
 
           {/* Precipitation unit */}
           <div>
-            <label className="text-sm font-semibold text-foreground block mb-2">Precipitation</label>
-            <p className="text-xs text-muted-foreground mb-3">Millimeters or inches</p>
+            <label className="text-sm font-semibold text-foreground block mb-2">{translateInterface("m123c1648c304")}</label>
+            <p className="text-xs text-muted-foreground mb-3">{translateInterface("md4276625e2c1")}</p>
             <div className="flex gap-2">
               {(["mm", "inch"] as PrecipUnit[]).map((u) => (
                 <button
@@ -123,7 +127,7 @@ export function WeatherSettingsPanel({ embedded = false }: { embedded?: boolean 
                       : "border-border/40 text-foreground hover:bg-card"
                   }`}
                 >
-                  {u === "mm" ? "Millimeters (mm)" : "Inches (in)"}
+                  {u === "mm" ? translateInterface("mfed19d3a21f4") : translateInterface("mf831c59e0926")}
                 </button>
               ))}
             </div>
@@ -136,9 +140,9 @@ export function WeatherSettingsPanel({ embedded = false }: { embedded?: boolean 
               disabled={saving}
               className="rounded-lg bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-60"
             >
-              {saving ? "Saving..." : "Save Settings"}
+              {saving ? translateInterface("mdc85af8f2b1d") : translateInterface("mec92e1dc9bb3")}
             </button>
-            {saved && <span className="text-sm text-green-500">✓ Saved</span>}
+            {saved && <span className="text-sm text-green-500">{translateInterface("m45edcc201b73")}</span>}
           </div>
         </div>
       </div>

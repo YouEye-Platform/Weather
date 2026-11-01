@@ -1,5 +1,11 @@
 "use client";
 
+import { useTranslations as useConditionTranslations } from "next-intl";
+
+import { useLocale as useInterfaceLocale } from "next-intl";
+
+
+import { useTranslations as useInterfaceTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Droplets, Wind, ChevronDown } from "lucide-react";
@@ -11,6 +17,13 @@ import type { WeatherData, UserPreferences } from "@/lib/weather/types";
 const DAY_NAMES_FULL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export default function ForecastPage() {
+  const translateInterface = useInterfaceTranslations("interface");
+
+  const conditionText = useConditionTranslations("weather.conditions");
+
+  const interfaceLocale = useInterfaceLocale();
+
+
   const [forecast, setForecast] = useState<{ daily: WeatherData["daily"]; hourly: WeatherData["hourly"]; prefs: UserPreferences } | null>(null);
   const [loading, setLoading] = useState(true);
   const [expandedDay, setExpandedDay] = useState<number | null>(null);
@@ -30,7 +43,7 @@ export default function ForecastPage() {
           <div className="mb-4 animate-pulse flex justify-center">
             <WeatherIcon name="CloudSun" size={48} />
           </div>
-          <p>Loading forecast...</p>
+          <p>{translateInterface("mf4fdd9a32de7")}</p>
         </div>
       </div>
     );
@@ -40,8 +53,8 @@ export default function ForecastPage() {
     return (
       <div className="min-h-screen p-8 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-muted-foreground mb-4">No forecast available. Set a default location first.</p>
-          <Link href="/locations" className="text-primary hover:underline">Manage locations →</Link>
+          <p className="text-muted-foreground mb-4">{translateInterface("mb2e901438923")}</p>
+          <Link href="/locations" className="text-primary hover:underline">{translateInterface("me8b947296b7c")}</Link>
         </div>
       </div>
     );
@@ -53,14 +66,14 @@ export default function ForecastPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-950/30 via-background to-background p-4 md:p-8">
       <div className="mx-auto max-w-3xl space-y-4">
         <div className="flex items-center gap-4 mb-6">
-          <Link href="/" className="text-muted-foreground hover:text-foreground text-sm">← Back</Link>
-          <h1 className="text-2xl font-bold">7-Day Forecast</h1>
+          <Link href="/" className="text-muted-foreground hover:text-foreground text-sm">{translateInterface("maceb696a04c1")}</Link>
+          <h1 className="text-2xl font-bold">{translateInterface("m3181eed107eb")}</h1>
         </div>
 
         {daily.time.map((dateStr, i) => {
           const date = new Date(dateStr + "T12:00:00");
-          const dayName = i === 0 ? "Today" : (DAY_NAMES_FULL[date.getDay()] ?? dateStr);
-          const condition = getWeatherCondition(daily.weather_code[i] ?? 0, true);
+          const dayName = i === 0 ? translateInterface("m2b065c7c9ce4") : date.toLocaleDateString(interfaceLocale, { weekday: "long" });
+          const condition = getWeatherCondition(daily.weather_code[i] ?? 0, true, conditionText);
           const isExpanded = expandedDay === i;
 
           // Hourly data for this day (24 hours starting at i*24)
@@ -90,20 +103,20 @@ export default function ForecastPage() {
 
               {/* Day details */}
               <div className="px-4 pb-3 flex gap-4 text-xs text-muted-foreground border-t border-border/20 pt-3">
-                <span className="flex items-center gap-1"><Droplets size={12} className="text-blue-400" /> {daily.precipitation_probability_max[i] ?? 0}% precip</span>
-                <span className="flex items-center gap-1"><Wind size={12} /> {formatWindSpeed(daily.wind_speed_10m_max[i] ?? 0, prefs.wind_speed_unit)} max</span>
-                <span>UV {daily.uv_index_max[i] ?? 0}</span>
+                <span className="flex items-center gap-1"><Droplets size={12} className="text-blue-400" /> {translateInterface("m61386bb40ec5", { chance: daily.precipitation_probability_max[i] ?? 0 })}</span>
+                <span className="flex items-center gap-1"><Wind size={12} /> {formatWindSpeed(daily.wind_speed_10m_max[i] ?? 0, prefs.wind_speed_unit)} {translateInterface("m9baf3a40312f")}</span>
+                <span>{translateInterface("m027fcbbc3e6f")}{daily.uv_index_max[i] ?? 0}</span>
               </div>
 
               {/* Expanded hourly breakdown */}
               {isExpanded && dayHours.length > 0 && (
                 <div className="border-t border-border/20 px-4 pb-4 pt-3">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3">Hourly breakdown</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3">{translateInterface("m75778f2b5617")}</p>
                   <div className="space-y-1 max-h-64 overflow-y-auto">
                     {dayHours.map((time, hi) => {
                       const hi2 = hourStart + hi;
-                      const hCondition = getWeatherCondition(hourly.weather_code[hi2] ?? 0, (hourly.is_day[hi2] ?? 1) === 1);
-                      const timeStr = new Date(time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                      const hCondition = getWeatherCondition(hourly.weather_code[hi2] ?? 0, (hourly.is_day[hi2] ?? 1) === 1, conditionText);
+                      const timeStr = new Date(time).toLocaleTimeString(interfaceLocale, { hour: "2-digit", minute: "2-digit" });
                       return (
                         <div key={time} className="flex items-center gap-3 text-sm">
                           <span className="w-16 text-muted-foreground text-xs">{timeStr}</span>

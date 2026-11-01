@@ -1,3 +1,8 @@
+import { getTranslations as getInterfaceTranslations } from "next-intl/server";
+import { useLocale } from "next-intl";
+
+import { useTranslations as useConditionTranslations } from "next-intl";
+import { useTranslations as useInterfaceTranslations } from "next-intl";
 import { getSession } from "@/lib/auth";
 import { ensureSchema } from "@/lib/db/migrate";
 import { fetchWeather } from "@/lib/weather/client";
@@ -7,7 +12,6 @@ import { query } from "@/lib/db/client";
 import { resolveWeatherDataUserId } from "@/lib/weather/user-id";
 import type { UserPreferences, SavedLocation, WeatherData } from "@/lib/weather/types";
 
-const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const WEATHER_ICONS: Record<string, string> = {
   Sun: "\u2600\uFE0F",
@@ -80,8 +84,12 @@ function EmptyState({ message }: { message: string }) {
 }
 
 function CurrentWeatherWidget({ ctx }: { ctx: WeatherContext }) {
+  const conditionText = useConditionTranslations("weather.conditions");
+
+  const translateInterface = useInterfaceTranslations("interface");
+
   const { weather, location, prefs } = ctx;
-  const condition = getWeatherCondition(weather.current.weather_code, weather.current.is_day);
+  const condition = getWeatherCondition(weather.current.weather_code, weather.current.is_day, conditionText);
   const emoji = getEmoji(condition.icon);
 
   return (
@@ -103,13 +111,13 @@ function CurrentWeatherWidget({ ctx }: { ctx: WeatherContext }) {
 
         <div className="flex gap-4 text-xs text-muted-foreground mt-auto">
           <span>
-            Feels {formatTemperature(weather.current.apparent_temperature, prefs.temperature_unit)}
+            {translateInterface("mcacde377e738")}{" "}{formatTemperature(weather.current.apparent_temperature, prefs.temperature_unit)}
           </span>
           <span>
-            Humidity {weather.current.humidity}%
+            {translateInterface("m46819ccb5e6d")}{" "}{weather.current.humidity}%
           </span>
           <span>
-            Wind {formatWindSpeed(weather.current.wind_speed, prefs.wind_speed_unit)}
+            {translateInterface("md151346fe7ee")}{" "}{formatWindSpeed(weather.current.wind_speed, prefs.wind_speed_unit)}
           </span>
         </div>
       </div>
@@ -118,6 +126,10 @@ function CurrentWeatherWidget({ ctx }: { ctx: WeatherContext }) {
 }
 
 function ForecastWeatherWidget({ ctx }: { ctx: WeatherContext }) {
+  const locale = useLocale();
+  const translateInterface = useInterfaceTranslations("interface");
+  const conditionText = useConditionTranslations("weather.conditions");
+
   const { weather, location, prefs } = ctx;
   const days = weather.daily.time.slice(0, 5);
 
@@ -125,14 +137,14 @@ function ForecastWeatherWidget({ ctx }: { ctx: WeatherContext }) {
     <div className="h-full p-2">
       <div className="h-full rounded-xl bg-card/50 backdrop-blur-md border border-border/20 p-4 flex flex-col gap-2">
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">
-          {location.name} — 5-Day Forecast
+          {translateInterface("fiveDayLocation", { location: location.name })}
         </p>
 
         <div className="flex flex-col gap-1 mt-1">
           {days.map((dateStr, i) => {
             const date = new Date(dateStr + "T12:00:00");
-            const dayName = i === 0 ? "Today" : DAY_NAMES[date.getDay()] ?? dateStr;
-            const condition = getWeatherCondition(weather.daily.weather_code[i] ?? 0, true);
+            const dayName = i === 0 ? translateInterface("today") : new Intl.DateTimeFormat(locale, { weekday: "short" }).format(date);
+            const condition = getWeatherCondition(weather.daily.weather_code[i] ?? 0, true, conditionText);
             const emoji = getEmoji(condition.icon);
             const high = formatTemperature(weather.daily.temperature_2m_max[i] ?? 0, prefs.temperature_unit);
             const low = formatTemperature(weather.daily.temperature_2m_min[i] ?? 0, prefs.temperature_unit);
@@ -163,11 +175,13 @@ export default async function EmbedWidgetPage({
 }: {
   params: Promise<{ widgetId: string }>;
 }) {
+  const translateInterface = await getInterfaceTranslations("interface");
+
   const { widgetId } = await params;
   const session = await getSession("ye-weather").catch(() => null);
 
   if (!session) {
-    return <EmptyState message="Sign in to see weather data." />;
+    return <EmptyState message={translateInterface("m02a3a0b2f39a")} />;
   }
 
   try {
@@ -175,7 +189,7 @@ export default async function EmbedWidgetPage({
     const ctx = await loadWeatherContext(dataUserId);
 
     if (!ctx) {
-      return <EmptyState message="No default location set. Open Weather to add one." />;
+      return <EmptyState message={translateInterface("mf984a8fc492c")} />;
     }
 
     if (widgetId === "weather-current") {
@@ -186,8 +200,8 @@ export default async function EmbedWidgetPage({
       return <ForecastWeatherWidget ctx={ctx} />;
     }
 
-    return <EmptyState message={`Unknown widget: ${widgetId}`} />;
+    return <EmptyState message={translateInterface("mec29e7f61294")} />;
   } catch {
-    return <EmptyState message="Weather data unavailable." />;
+    return <EmptyState message={translateInterface("mda1a72631d5a")} />;
   }
 }

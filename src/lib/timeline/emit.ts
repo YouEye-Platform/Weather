@@ -1,3 +1,4 @@
+import { getActivityTranslator } from "@/i18n/activity";
 /**
  * Weather Timeline Event Emitters
  *
@@ -53,16 +54,19 @@ export async function emitWeatherCheckEvent(
   condition: string,
   domain: string,
   lat: number,
-  lon: number
+  lon: number,
+  timestamp = new Date().toISOString()
 ): Promise<void> {
+  const { t } = await getActivityTranslator(userId);
   await emitIfNotDebounced(userId, `weather-check:${locationId}`, "history", {
+    timestamp,
     app_id: "weather",
     entry_type: "weather-check",
-    title: `Weather: ${locationName} — ${temperature}, ${condition}`,
+    title: t("m86fa20eae879", {location: locationName, temperature, condition}),
     embed_path: `/embed/timeline/weather?lat=${lat}&lon=${lon}&loc=${encodeURIComponent(locationName)}&temp=${encodeURIComponent(temperature)}&cond=${encodeURIComponent(condition)}`,
     tags: { location: locationName },
     data: {
-      description: `${temperature}, ${condition} in ${locationName}`,
+      description: t("m3467250f5832", {location: locationName, temperature, condition}),
       temperature,
       condition,
       location_name: locationName,
@@ -82,16 +86,19 @@ export async function emitLocationAddedEvent(
   locationId: string,
   domain: string,
   lat: number,
-  lon: number
+  lon: number,
+  timestamp = new Date().toISOString()
 ): Promise<void> {
+  const { t } = await getActivityTranslator(userId);
   await emitIfNotDebounced(userId, `location-added:${locationId}`, "history", {
+    timestamp,
     app_id: "weather",
     entry_type: "weather-location-added",
-    title: `Added weather location: ${locationName}`,
+    title: t("ma3498e7aa120", {location: locationName}),
     embed_path: `/embed/timeline/weather?lat=${lat}&lon=${lon}&loc=${encodeURIComponent(locationName)}&action=added`,
     tags: { location: locationName },
     data: {
-      description: `Added ${locationName} to saved locations`,
+      description: t("m9be542436da1", {location: locationName}),
       location_name: locationName,
       location_id: locationId,
       lat,

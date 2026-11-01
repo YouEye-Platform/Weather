@@ -1,3 +1,6 @@
+import {getLocale} from "next-intl/server";
+
+import { getTranslations as getInterfaceTranslations } from "next-intl/server";
 import type React from "react";
 import { CloudSun, Droplets, Gauge, MapPin, Wind } from "lucide-react";
 import { fetchWeather } from "@/lib/weather/client";
@@ -9,22 +12,28 @@ interface WeatherCardPageProps {
 }
 
 export default async function WeatherCardPage({ searchParams }: WeatherCardPageProps) {
+  const conditionText = await getInterfaceTranslations("weather.conditions");
+
+  const translateInterface = await getInterfaceTranslations("interface");
+  const cardText = await getInterfaceTranslations("weatherCard");
+
+  const locale = await getLocale();
   const params = await searchParams;
   const lat = Number(params.lat);
   const lon = Number(params.lon);
-  const name = params.name || "Weather";
+  const name = params.name || cardText("name");
 
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-    return <CardError message="No location provided" />;
+    return <CardError message={cardText("noLocation")} />;
   }
 
   const weather = await fetchWeather(lat, lon, "UTC");
-  if (!weather) return <CardError message="Weather data unavailable" />;
+  if (!weather) return <CardError message={cardText("unavailable")} />;
 
-  const condition = getWeatherCondition(weather.current.weather_code, weather.current.is_day);
+  const condition = getWeatherCondition(weather.current.weather_code, weather.current.is_day, conditionText);
   const temp = formatTemperature(weather.current.temperature, "celsius");
   const feels = formatTemperature(weather.current.apparent_temperature, "celsius");
-  const wind = `${formatWindSpeed(weather.current.wind_speed, "kmh")} ${windDirectionToCompass(weather.current.wind_direction)}`;
+  const wind = `${formatWindSpeed(weather.current.wind_speed, "kmh", locale)} ${windDirectionToCompass(weather.current.wind_direction, locale)}`;
 
   return (
     <div className="rounded-xl border border-border bg-card p-4 text-foreground">
@@ -38,13 +47,13 @@ export default async function WeatherCardPage({ searchParams }: WeatherCardPageP
             <span className="truncate">{name}</span>
           </div>
           <h2 className="mt-1 text-3xl font-semibold leading-none">{temp}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">{condition.description}, feels like {feels}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{cardText("conditionFeels", { condition: condition.description, temperature: feels })}</p>
         </div>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
-        <Fact icon={<Droplets className="h-3.5 w-3.5" />} label="Humidity" value={`${weather.current.humidity}%`} />
-        <Fact icon={<Wind className="h-3.5 w-3.5" />} label="Wind" value={wind} />
-        <Fact icon={<Gauge className="h-3.5 w-3.5" />} label="Pressure" value={`${Math.round(weather.current.pressure)} hPa`} />
+        <Fact icon={<Droplets className="h-3.5 w-3.5" />} label={translateInterface("m46819ccb5e6d")} value={`${weather.current.humidity}%`} />
+        <Fact icon={<Wind className="h-3.5 w-3.5" />} label={translateInterface("md151346fe7ee")} value={wind} />
+        <Fact icon={<Gauge className="h-3.5 w-3.5" />} label={translateInterface("m1f8407f9eeb1")} value={`${Math.round(weather.current.pressure)} hPa`} />
       </div>
     </div>
   );

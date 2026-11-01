@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations as useInterfaceTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Search, Star, Trash2 } from "lucide-react";
@@ -9,6 +10,8 @@ import { formatTemperature } from "@/lib/weather/units";
 import { getWeatherCondition } from "@/lib/weather/codes";
 
 export default function LocationsPage() {
+  const translateInterface = useInterfaceTranslations("interface");
+
   const [locations, setLocations] = useState<SavedLocation[]>([]);
   const [prefs, setPrefs] = useState<UserPreferences | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -91,7 +94,7 @@ export default function LocationsPage() {
   };
 
   const deleteLocation = async (id: string) => {
-    if (!confirm("Delete this location?")) return;
+    if (!confirm(translateInterface("mbd4ad71e48e8"))) return;
     setDeleting(id);
     await fetch(`/api/locations/${id}`, { method: "DELETE" });
     setDeleting(null);
@@ -102,8 +105,8 @@ export default function LocationsPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-950/30 via-background to-background p-4 md:p-8">
       <div className="mx-auto max-w-2xl space-y-6">
         <div className="flex items-center gap-4">
-          <Link href="/" className="text-muted-foreground hover:text-foreground text-sm">← Back</Link>
-          <h1 className="text-2xl font-bold">Manage Locations</h1>
+          <Link href="/" className="text-muted-foreground hover:text-foreground text-sm">{translateInterface("maceb696a04c1")}</Link>
+          <h1 className="text-2xl font-bold">{translateInterface("mf08057d48dd5")}</h1>
         </div>
 
         {/* Search */}
@@ -112,7 +115,7 @@ export default function LocationsPage() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search cities..."
+            placeholder={translateInterface("m9c4e01fa5d38")}
             className="w-full rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
           />
           {searching && (
@@ -144,7 +147,7 @@ export default function LocationsPage() {
         {locations.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
             <div className="mb-4 flex justify-center"><WeatherIcon name="Sun" size={48} /></div>
-            <p>No saved locations. Search above to add one.</p>
+            <p>{translateInterface("m97c8110b4fc6")}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -167,7 +170,7 @@ export default function LocationsPage() {
                     <div className="flex items-center gap-2">
                       <p className="font-medium text-foreground truncate">{loc.name}</p>
                       {isDefault && (
-                        <span className="text-xs rounded-full bg-primary/10 text-primary px-2 py-0.5 border border-primary/20">Default</span>
+                        <span className="text-xs rounded-full bg-primary/10 text-primary px-2 py-0.5 border border-primary/20">{translateInterface("m21b111cbfe6e")}</span>
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground">
@@ -189,7 +192,7 @@ export default function LocationsPage() {
                         ? "text-yellow-500"
                         : "text-muted-foreground hover:text-yellow-500 hover:bg-yellow-500/10"
                     }`}
-                    title={isDefault ? "Default location" : "Set as default"}
+                    title={isDefault ? translateInterface("m40d8d52d9e35") : translateInterface("md09b4dd6265a")}
                   >
                     <Star size={18} fill={isDefault ? "currentColor" : "none"} />
                   </button>
@@ -199,7 +202,7 @@ export default function LocationsPage() {
                     onClick={() => deleteLocation(loc.id)}
                     disabled={deleting === loc.id}
                     className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                    title="Delete location"
+                    title={translateInterface("m383e202b8547")}
                   >
                     <Trash2 size={18} />
                   </button>

@@ -10,6 +10,7 @@ import { resolveWeatherDataUserId } from "@/lib/weather/user-id";
 import type { UserPreferences, SavedLocation } from "@/lib/weather/types";
 
 export async function GET(request: NextRequest) {
+  const actionTimestamp = new Date().toISOString();
   const session = await getSession("ye-weather");
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -72,7 +73,7 @@ export async function GET(request: NextRequest) {
   if (locationId) {
     const domain = process.env.WEATHER_EXTERNAL_URL?.replace(/^https?:\/\//, "").replace(/\/$/, "") ?? request.headers.get("host") ?? "";
     if (domain) {
-      emitWeatherCheckEvent(dataUserId, locationName, locationId, tempStr, condition.description, domain, lat, lon).catch(() => {});
+      emitWeatherCheckEvent(dataUserId, locationName, locationId, tempStr, condition.description, domain, lat, lon, actionTimestamp).catch(() => {});
     }
   }
 

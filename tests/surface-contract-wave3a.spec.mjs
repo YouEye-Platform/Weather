@@ -43,10 +43,8 @@ test("Weather declares the Wave 3A surface contract", () => {
   assert.doesNotMatch(route, /kind: "notification"/);
   assert.doesNotMatch(yaml, /kind: notification/);
 
-  const i18n = read("src/i18n/request.ts");
-  assert.ok(i18n.includes("/platform"));
-  assert.ok(i18n.includes("Authorization"));
-  assert.doesNotMatch(i18n, /CP_INTERNAL_URL|youeye-control|ui-bridge/);
+  // Locale now comes from the authenticated root layout. Its behavior and
+  // account isolation are exercised by locale-propagation.spec.mjs.
   assert.ok(has("src/app/embed/card/weather/page.tsx"));
 });
 

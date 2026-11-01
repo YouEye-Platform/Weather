@@ -22,6 +22,7 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const actionTimestamp = new Date().toISOString();
   const session = await getSession("ye-weather");
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
   // Emit timeline event (best-effort) — derive domain from request, never hardcode
   const domain = process.env.WEATHER_EXTERNAL_URL?.replace(/^https?:\/\//, "").replace(/\/$/, "") ?? request.headers.get("host") ?? "";
   if (domain) {
-    emitLocationAddedEvent(session.userId, location.name, location.id, domain, location.latitude, location.longitude).catch(() => {});
+    emitLocationAddedEvent(session.userId, location.name, location.id, domain, location.latitude, location.longitude, actionTimestamp).catch(() => {});
   }
 
   return NextResponse.json({ data: location }, { status: 201 });

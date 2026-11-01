@@ -1,3 +1,4 @@
+import {getLocale, getTranslations} from "next-intl/server";
 import { getSession } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { fetchWeather } from "@/lib/weather/client";
@@ -25,6 +26,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
+  const locale = await getLocale();
+  const conditionText = await getTranslations("weather.conditions");
   const { request_type, data } = body;
 
   if (request_type === "weather-summary") {
@@ -39,13 +42,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Weather data unavailable" }, { status: 502 });
     }
 
-    const condition = getWeatherCondition(weather.current.weather_code, weather.current.is_day);
+    const condition = getWeatherCondition(weather.current.weather_code, weather.current.is_day, conditionText);
     return NextResponse.json({
       result: {
         temperature: formatTemperature(weather.current.temperature, "celsius"),
         condition: condition.description,
         icon: condition.icon,
-        wind: `${formatWindSpeed(weather.current.wind_speed, "kmh")} ${windDirectionToCompass(weather.current.wind_direction)}`,
+        wind: `${formatWindSpeed(weather.current.wind_speed, "kmh", locale)} ${windDirectionToCompass(weather.current.wind_direction, locale)}`,
         humidity: weather.current.humidity,
       },
     });

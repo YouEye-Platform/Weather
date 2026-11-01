@@ -4,14 +4,10 @@ import { internetFetch } from "@/lib/internet";
 const GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search";
 const FORECAST_URL = "https://api.open-meteo.com/v1/forecast";
 
-/** In-process cache: key = "lat,lon" (2 decimals), value = { data, fetchedAt } */
+/** Cache the exact request representation, including acting user and units. */
 const weatherCache = new Map<string, { data: WeatherData; fetchedAt: number }>();
 const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
 const MAX_CACHE_ENTRIES = 200;
-
-function cacheKey(lat: number, lon: number): string {
-  return `${lat.toFixed(2)},${lon.toFixed(2)}`;
-}
 
 function evictStaleEntries(): void {
   if (weatherCache.size <= MAX_CACHE_ENTRIES) return;
@@ -47,7 +43,7 @@ export async function fetchWeather(
   precipitationUnit: "mm" | "inch" = "mm",
   userId?: string,
 ): Promise<WeatherData | null> {
-  const key = cacheKey(lat, lon);
+  const key = JSON.stringify([lat, lon, timezone, temperatureUnit, windSpeedUnit, precipitationUnit, userId ?? null]);
   const cached = weatherCache.get(key);
   if (cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
     return cached.data;

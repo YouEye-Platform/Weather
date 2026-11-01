@@ -1,3 +1,4 @@
+import { getTranslations as getInterfaceTranslations } from "next-intl/server";
 /**
  * Weather Timeline Embed — Weather Card
  *
@@ -26,6 +27,8 @@ interface PageProps {
 }
 
 export default async function TimelineWeatherPage({ searchParams }: PageProps) {
+  const translateInterface = await getInterfaceTranslations("interface");
+
   const params = await searchParams;
   const { loc = "Unknown", temp, cond, action } = params;
 
@@ -46,7 +49,7 @@ export default async function TimelineWeatherPage({ searchParams }: PageProps) {
           <div className="flex items-center gap-1.5 mb-1">
             <CloudSun className="h-3.5 w-3.5 text-sky-500" />
             <span className="text-[11px] font-medium text-sky-500">
-              {isAdded ? "Location Added" : "Weather Check"}
+              {isAdded ? translateInterface("md353adc137be") : translateInterface("mfaec81541a46")}
             </span>
           </div>
 
@@ -62,8 +65,7 @@ export default async function TimelineWeatherPage({ searchParams }: PageProps) {
 
           {isAdded && (
             <p className="text-[11px] text-muted-foreground mt-0.5">
-              Added to saved locations
-            </p>
+              {translateInterface("mdd4cad8b1cef")}</p>
           )}
         </div>
       </div>

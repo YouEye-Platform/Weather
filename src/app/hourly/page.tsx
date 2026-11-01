@@ -1,5 +1,11 @@
 "use client";
 
+import { useTranslations as useConditionTranslations } from "next-intl";
+
+import { useLocale as useInterfaceLocale } from "next-intl";
+
+
+import { useTranslations as useInterfaceTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Droplets } from "lucide-react";
@@ -9,6 +15,13 @@ import { formatTemperature, formatWindSpeed } from "@/lib/weather/units";
 import type { WeatherData, UserPreferences } from "@/lib/weather/types";
 
 export default function HourlyPage() {
+  const translateInterface = useInterfaceTranslations("interface");
+
+  const conditionText = useConditionTranslations("weather.conditions");
+
+  const interfaceLocale = useInterfaceLocale();
+
+
   const [data, setData] = useState<{ hourly: WeatherData["hourly"]; daily: WeatherData["daily"]; prefs: UserPreferences } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -25,7 +38,7 @@ export default function HourlyPage() {
       <div className="min-h-screen p-8 flex items-center justify-center">
         <div className="text-center text-muted-foreground">
           <div className="mb-4 animate-pulse flex justify-center"><WeatherIcon name="CloudSun" size={48} /></div>
-          <p>Loading...</p>
+          <p>{translateInterface("m47d2a515ef2f")}</p>
         </div>
       </div>
     );
@@ -35,8 +48,8 @@ export default function HourlyPage() {
     return (
       <div className="min-h-screen p-8 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-muted-foreground mb-4">No data available. Set a default location first.</p>
-          <Link href="/locations" className="text-primary hover:underline">Manage locations →</Link>
+          <p className="text-muted-foreground mb-4">{translateInterface("m51ec934cf277")}</p>
+          <Link href="/locations" className="text-primary hover:underline">{translateInterface("me8b947296b7c")}</Link>
         </div>
       </div>
     );
@@ -60,18 +73,18 @@ export default function HourlyPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-950/30 via-background to-background p-4 md:p-8">
       <div className="mx-auto max-w-2xl space-y-4">
         <div className="flex items-center gap-4 mb-6">
-          <Link href="/" className="text-muted-foreground hover:text-foreground text-sm">← Back</Link>
-          <h1 className="text-2xl font-bold">48-Hour Forecast</h1>
+          <Link href="/" className="text-muted-foreground hover:text-foreground text-sm">{translateInterface("maceb696a04c1")}</Link>
+          <h1 className="text-2xl font-bold">{translateInterface("m2834c63b374a")}</h1>
         </div>
 
         <div className="rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm overflow-hidden">
           {hours.map((timeStr, i) => {
             const time = new Date(timeStr);
-            const timeLabel = time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-            const dateLabel = i === 0 || time.getHours() === 0 ? time.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" }) : null;
+            const timeLabel = time.toLocaleTimeString(interfaceLocale, { hour: "2-digit", minute: "2-digit" });
+            const dateLabel = i === 0 || time.getHours() === 0 ? time.toLocaleDateString(interfaceLocale, { weekday: "short", month: "short", day: "numeric" }) : null;
             const temp = hourly.temperature_2m[i] ?? 0;
             const isDay = (hourly.is_day[i] ?? 1) === 1;
-            const condition = getWeatherCondition(hourly.weather_code[i] ?? 0, isDay);
+            const condition = getWeatherCondition(hourly.weather_code[i] ?? 0, isDay, conditionText);
             const barWidth = Math.max(5, Math.round(((temp - minTemp) / tempRange) * 100));
             const precipProb = hourly.precipitation_probability[i] ?? 0;
             const wind = hourly.wind_speed_10m[i] ?? 0;
@@ -92,8 +105,7 @@ export default function HourlyPage() {
                 )}
                 {isSunEvent && !dateLabel && (
                   <div className="px-4 py-1 bg-amber-500/10 border-t border-amber-500/20 text-xs text-amber-500">
-                    ☀️ Sunrise/Sunset
-                  </div>
+                    {translateInterface("me0e1923ac13c")}</div>
                 )}
                 <div className="flex items-center gap-3 px-4 py-3 border-t border-border/10 first:border-t-0 hover:bg-card/80 transition-colors">
                   <span className="w-14 text-sm text-muted-foreground">{timeLabel}</span>
