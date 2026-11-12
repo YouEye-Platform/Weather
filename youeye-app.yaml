@@ -3,7 +3,7 @@ kind: app
 integration: native
 data_ownership:
   per_user: identity_uuid
-version: 0.6.0
+version: 0.0.0
 surfaceSchemaVersion: 1
 metadata:
   id: "weather"
@@ -127,7 +127,7 @@ containers:
     primary: true
     network: isolated
     source:
-      repo: potemsla/YE-App-Weather
+      repo: YouEye-Platform/Weather
       nodeVersion: "24.x"
       appDir: /opt/app
     healthCheck:
