@@ -31,9 +31,9 @@ test("Weather publishes canonical surfaces in runtime and install manifests", ()
   assert.doesNotMatch(route, /\n\s+timeline_embeds:\s*\[/);
 
   assert.match(yaml, versionPattern());
-  assert.match(yaml, /surfaceSchemaVersion: 1/);
+  assert.match(yaml, /^schema: youeye\.app\.v1$/m);
   assert.match(yaml, /- id: weather-current/);
   assert.match(yaml, /kind: settings-panel/);
   assert.match(yaml, /kind: info-card/);
-  assert.match(yaml, /- weather-location-added/);
+  assert.match(yaml, /triggers: \[[^\]]*\bweather-location-added\b/);
 });
