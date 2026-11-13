@@ -48,7 +48,7 @@ test("Weather declares the Wave 3A surface contract", () => {
   assert.ok(has("src/app/embed/card/weather/page.tsx"));
 });
 
-test("Weather runtime source no longer emits legacy embed messages", () => {
+test("Weather runtime source emits no removed embed message types", () => {
   const combined = sourceFiles("src").map((file) => read(file)).join("\n");
   assert.doesNotMatch(combined, /youeye-embed-ready|youeye-embed-resize|youeye-card-ready|youeye-app-settings-resize|contentHeight|settings\?embed=true/);
 });
