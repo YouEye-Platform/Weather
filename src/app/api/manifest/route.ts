@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { BUILD_VERSION } from "@/lib/build-version";
+import { APP_VERSION } from "@/lib/app-version";
 
 export async function GET() {
   return NextResponse.json({
     id: "ye-weather",
     name: "Weather",
-    version: BUILD_VERSION,
+    version: APP_VERSION,
     description: "Weather forecasts and conditions for your saved locations",
     icon: "CloudSun",
     permissions: ["timeline:write", "widgets:register"],
